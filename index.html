@@ -30,15 +30,12 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1rem; }
   .card-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
   .card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-
-  /* Date picker bar */
   .date-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .date-bar label { font-size: 13px; color: var(--muted); white-space: nowrap; }
   .date-input { font-family: var(--mono); font-size: 13px; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); padding: 6px 10px; outline: none; flex: 1; min-width: 140px; }
   .date-input:focus { border-color: var(--accent); }
   .date-today-btn { font-size: 12px; color: var(--accent); background: none; border: 1px solid var(--accent); border-radius: 6px; padding: 5px 12px; cursor: pointer; font-family: var(--font); white-space: nowrap; }
   .date-today-btn:hover { background: rgba(79,142,247,0.1); }
-
   .product-row { display: grid; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
   .product-row:last-child { border-bottom: none; }
   .product-row:hover { background: rgba(255,255,255,0.02); }
@@ -61,6 +58,8 @@
   .btn-primary:hover { background: #3a7de0; }
   .btn-success { background: var(--green); color: #0f1117; }
   .btn-success:hover { opacity: 0.9; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { opacity: 0.85; }
   .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.2rem; }
   .metric { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
   .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
@@ -83,10 +82,37 @@
   .row-sale { grid-template-columns: 1fr auto auto; }
   .row-stock { grid-template-columns: 1fr 80px 50px; }
   .date-badge { font-family: var(--mono); font-size: 11px; background: var(--surface2); border-radius: 6px; padding: 4px 10px; color: var(--muted); }
+
+  /* ── จัดการสินค้า ── */
+  .manage-form { padding: 16px; display: grid; gap: 10px; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .inp { font-family: var(--font); font-size: 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); padding: 8px 12px; outline: none; width: 100%; }
+  .inp:focus { border-color: var(--accent); }
+  .inp::placeholder { color: var(--muted); }
+  .btn-add { display: block; width: 100%; padding: 10px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); transition: all 0.15s; }
+  .btn-add:hover { background: #3a7de0; }
+  .manage-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .manage-row:last-child { border-bottom: none; }
+  .manage-actions { display: flex; gap: 6px; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border2); background: var(--surface2); color: var(--muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; }
+  .icon-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .icon-btn.edit:hover { border-color: var(--accent); color: var(--accent); }
+  .prod-num { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--surface2); border-radius: 5px; padding: 2px 6px; margin-right: 4px; }
+
+  /* modal */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px; padding: 20px; width: 90%; max-width: 380px; }
+  .modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+  .modal .inp { margin-bottom: 10px; }
+  .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .btn-cancel { padding: 10px; border-radius: 8px; background: var(--surface2); color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border2); font-family: var(--font); }
+
   @media (max-width: 480px) {
     .main { padding: 1rem; }
     .metrics { grid-template-columns: repeat(2, 1fr); }
     .header { padding: 0 1rem; }
+    .input-row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -102,6 +128,7 @@
   <button class="tab" onclick="switchTab('sale')">💰 บันทึกยอดขาย</button>
   <button class="tab" onclick="switchTab('stock')">📦 สต็อกในตู้</button>
   <button class="tab" onclick="switchTab('summary')">📊 สรุปรายวัน</button>
+  <button class="tab" onclick="switchTab('manage')">⚙️ จัดการสินค้า</button>
   <button class="tab" onclick="switchTab('export')">📥 Export Excel</button>
 </div>
 
@@ -165,6 +192,24 @@
     </div>
   </div>
 
+  <!-- MANAGE -->
+  <div id="sec-manage" class="section">
+    <div class="card">
+      <div class="card-header"><span class="card-title">เพิ่มสินค้าใหม่</span></div>
+      <div class="manage-form">
+        <div class="input-row">
+          <input type="text" class="inp" id="new-name" placeholder="ชื่อสินค้า เช่น เป๊ปซี่">
+          <input type="text" class="inp" id="new-sub" placeholder="รายละเอียด เช่น 325 มล. (ถ้ามี)">
+        </div>
+        <button class="btn-add" onclick="addProduct()">➕ เพิ่มสินค้า</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">รายการสินค้าทั้งหมด</span><span class="date-badge" id="product-count">0 รายการ</span></div>
+      <div id="manage-list"><div class="loading">⏳ กำลังโหลด...</div></div>
+    </div>
+  </div>
+
   <!-- EXPORT -->
   <div id="sec-export" class="section">
     <div class="card">
@@ -184,12 +229,27 @@
   </div>
 
 </div>
+
+<!-- Edit Modal -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <h3>✏️ แก้ไขสินค้า</h3>
+    <input type="hidden" id="edit-id">
+    <input type="text" class="inp" id="edit-name" placeholder="ชื่อสินค้า">
+    <input type="text" class="inp" id="edit-sub" placeholder="รายละเอียด (ถ้ามี)">
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn-add" onclick="saveEdit()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, get, push, update, remove, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIYgK6WaiwBblGF5APTvT2MkONMhLh1mg",
@@ -204,7 +264,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const products = [
+// รายการสินค้าเริ่มต้น (จะถูก override จาก Firebase ถ้ามี)
+const DEFAULT_PRODUCTS = [
   { id: 1,  name: 'แฟนต้า น้ำเขียว',            sub: '180 มล.' },
   { id: 2,  name: 'VENSON Bullet Diamond Speed', sub: '75 ลูกแบดมินตัน' },
   { id: 3,  name: 'แฟนต้า น้ำแดง',              sub: '180 มล.' },
@@ -219,9 +280,9 @@ const products = [
   { id: 12, name: 'น้ำดื่ม',                     sub: '' },
 ];
 
+let products = [];
 let stock = {};
 let refillQty = {}, saleQty = {};
-products.forEach(p => { refillQty[p.id] = 0; saleQty[p.id] = 0; });
 
 // ── helpers ──
 function localDateStr(d = new Date()) {
@@ -233,20 +294,77 @@ function thaiDate(dateStr) {
 }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString('th-TH',{year:'numeric',month:'2-digit',day:'2-digit'}); }
 function fmtTime(ts) { return new Date(ts).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function barColor(q) { return q===0?'#f76f6f':q<4?'#f7b84f':'#38d9a9'; }
 
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'), 2800);
 }
-function barColor(q) { return q===0?'#f76f6f':q<4?'#f7b84f':'#38d9a9'; }
 
 window.setToday = id => { document.getElementById(id).value = localDateStr(); };
 setToday('refill-date'); setToday('sale-date'); setToday('summary-date');
 
-// ── render lists ──
+// ── init products from Firebase ──
+async function initProducts() {
+  const snap = await get(ref(db, 'products'));
+  if (snap.exists()) {
+    const data = snap.val();
+    products = Object.entries(data)
+      .map(([k, v]) => ({...v, _key: k}))
+      .sort((a, b) => a.order - b.order);
+  } else {
+    // ครั้งแรก: อัปโหลด default products ขึ้น Firebase
+    const updates = {};
+    DEFAULT_PRODUCTS.forEach((p, i) => {
+      const key = `p${p.id}`;
+      updates[key] = { id: p.id, name: p.name, sub: p.sub, order: i, active: true };
+    });
+    await set(ref(db, 'products'), updates);
+    products = DEFAULT_PRODUCTS.map((p, i) => ({...p, _key:`p${p.id}`, order:i, active:true}));
+  }
+  syncQtyArrays();
+  renderAll();
+}
+
+function syncQtyArrays() {
+  products.forEach(p => {
+    if (refillQty[p.id] === undefined) refillQty[p.id] = 0;
+    if (saleQty[p.id] === undefined) saleQty[p.id] = 0;
+  });
+}
+
+// ── realtime listeners ──
+onValue(ref(db, 'products'), snap => {
+  if (!snap.exists()) return;
+  const data = snap.val();
+  products = Object.entries(data)
+    .map(([k, v]) => ({...v, _key: k}))
+    .filter(p => p.active !== false)
+    .sort((a, b) => a.order - b.order);
+  syncQtyArrays();
+  renderAll();
+});
+
+onValue(ref(db, 'stock'), snap => {
+  stock = snap.val() || {};
+  products.forEach(p => { if (!stock[p.id]) stock[p.id] = 0; });
+  renderSaleList();
+  renderStockList();
+  if (document.getElementById('sec-summary').classList.contains('active')) renderSummary();
+});
+
+function renderAll() {
+  renderRefillList();
+  renderSaleList();
+  renderStockList();
+  renderManageList();
+  if (document.getElementById('sec-summary').classList.contains('active')) renderSummary();
+}
+
+// ── render ──
 function renderRefillList() {
-  document.getElementById('refill-list').innerHTML = products.map(p=>`
+  document.getElementById('refill-list').innerHTML = products.map(p => `
     <div class="product-row row-refill">
       <div><div class="pname">${p.name}</div>${p.sub?`<div class="psub">${p.sub}</div>`:''}</div>
       <div class="qty-wrap">
@@ -258,7 +376,7 @@ function renderRefillList() {
 }
 
 function renderSaleList() {
-  document.getElementById('sale-list').innerHTML = products.map(p=>{
+  document.getElementById('sale-list').innerHTML = products.map(p => {
     const q = stock[p.id]||0, cls = q===0?'empty':q<4?'low':'ok';
     return `<div class="product-row row-sale">
       <div><div class="pname">${p.name}</div>${p.sub?`<div class="psub">${p.sub}</div>`:''}</div>
@@ -273,9 +391,9 @@ function renderSaleList() {
 }
 
 function renderStockList() {
-  const max = Math.max(...products.map(p=>stock[p.id]||0),1);
-  document.getElementById('stock-list').innerHTML = products.map(p=>{
-    const q=stock[p.id]||0, pct=Math.round(q/max*100), cls=q===0?'empty':q<4?'low':'ok';
+  const max = Math.max(...products.map(p => stock[p.id]||0), 1);
+  document.getElementById('stock-list').innerHTML = products.map(p => {
+    const q = stock[p.id]||0, pct = Math.round(q/max*100), cls = q===0?'empty':q<4?'low':'ok';
     return `<div class="product-row row-stock">
       <div><div class="pname">${p.name}</div>${p.sub?`<div class="psub">${p.sub}</div>`:''}</div>
       <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${barColor(q)}"></div></div>
@@ -286,23 +404,39 @@ function renderStockList() {
     new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
 }
 
+function renderManageList() {
+  document.getElementById('product-count').textContent = `${products.length} รายการ`;
+  document.getElementById('manage-list').innerHTML = products.length
+    ? products.map((p, i) => `
+      <div class="manage-row">
+        <div>
+          <span class="prod-num">#${i+1}</span>
+          <span class="pname" style="display:inline;">${p.name}</span>
+          ${p.sub ? `<div class="psub" style="margin-top:2px;margin-left:28px;">${p.sub}</div>` : ''}
+        </div>
+        <div class="manage-actions">
+          <button class="icon-btn edit" onclick="openEdit('${p._key}','${p.id}','${p.name.replace(/'/g,"\\'")}','${p.sub.replace(/'/g,"\\'")}')">✏️</button>
+          <button class="icon-btn" onclick="deleteProduct('${p._key}','${p.id}','${p.name.replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>`).join('')
+    : '<div class="empty">ยังไม่มีสินค้า</div>';
+}
+
 window.renderSummary = function() {
   const dateStr = document.getElementById('summary-date').value || localDateStr();
   const key = dateToKey(dateStr);
-  get(ref(db,`logs/${key}`)).then(snap=>{
+  get(ref(db,`logs/${key}`)).then(snap => {
     const all = Object.values(snap.val()||{});
     const rLogs = all.filter(l=>l.type==='refill');
     const sLogs = all.filter(l=>l.type==='sale');
     document.getElementById('m-refill').textContent = rLogs.reduce((s,l)=>s+l.qty,0);
     document.getElementById('m-sale').textContent   = sLogs.reduce((s,l)=>s+l.qty,0);
     document.getElementById('m-total').textContent  = products.reduce((s,p)=>s+(stock[p.id]||0),0);
-
     const aggR={};
     rLogs.forEach(l=>{aggR[l.name]=(aggR[l.name]||0)+l.qty;});
     document.getElementById('log-refill').innerHTML = Object.keys(aggR).length
       ? Object.entries(aggR).map(([n,q])=>`<div class="log-row"><span class="log-name">${n}</span><span class="log-qty plus">+${q} ชิ้น</span></div>`).join('')
       : '<div class="empty">ยังไม่มีรายการ</div>';
-
     const aggS={};
     sLogs.forEach(l=>{aggS[l.name]=(aggS[l.name]||0)+l.qty;});
     document.getElementById('log-sale').innerHTML = Object.keys(aggS).length
@@ -311,39 +445,33 @@ window.renderSummary = function() {
   });
 };
 
-// Realtime
-onValue(ref(db,'stock'), snap=>{
-  stock = snap.val()||{};
-  products.forEach(p=>{ if(!stock[p.id]) stock[p.id]=0; });
-  renderSaleList(); renderStockList();
-  if(document.getElementById('sec-summary').classList.contains('active')) renderSummary();
-});
-
-window.changeQty = function(type,pid,delta){
-  const el=document.getElementById(`${type}-qty-${pid}`);
-  const obj=type==='refill'?refillQty:saleQty;
-  obj[pid]=Math.max(0,(parseInt(el?.value)||0)+delta);
-  if(el) el.value=obj[pid];
+// ── qty ──
+window.changeQty = function(type, pid, delta) {
+  const el = document.getElementById(`${type}-qty-${pid}`);
+  const obj = type==='refill'?refillQty:saleQty;
+  obj[pid] = Math.max(0, (parseInt(el?.value)||0)+delta);
+  if(el) el.value = obj[pid];
 };
-window.syncQty = function(type,pid,el){
-  const obj=type==='refill'?refillQty:saleQty;
-  const v=parseInt(el.value);
-  obj[pid]=isNaN(v)||v<0?0:v;
+window.syncQty = function(type, pid, el) {
+  const obj = type==='refill'?refillQty:saleQty;
+  const v = parseInt(el.value);
+  obj[pid] = isNaN(v)||v<0?0:v;
 };
 
-window.confirmRefill = async function(){
-  const dateStr=document.getElementById('refill-date').value;
+// ── confirm ──
+window.confirmRefill = async function() {
+  const dateStr = document.getElementById('refill-date').value;
   if(!dateStr){toast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
-  const key=dateToKey(dateStr);
-  const ts=new Date(dateStr+'T12:00:00').getTime();
-  const updates={};let any=false;
-  for(const p of products){
-    const q=refillQty[p.id];
-    if(q>0){
-      updates[`stock/${p.id}`]=(stock[p.id]||0)+q;
+  const key = dateToKey(dateStr);
+  const ts = new Date(dateStr+'T12:00:00').getTime();
+  const updates = {}; let any = false;
+  for(const p of products) {
+    const q = refillQty[p.id];
+    if(q>0) {
+      updates[`stock/${p.id}`] = (stock[p.id]||0)+q;
       await push(ref(db,`logs/${key}`),{type:'refill',id:p.id,name:p.name,qty:q,ts,dateStr});
       refillQty[p.id]=0;
-      const el=document.getElementById(`refill-qty-${p.id}`);
+      const el = document.getElementById(`refill-qty-${p.id}`);
       if(el) el.value=0;
       any=true;
     }
@@ -353,21 +481,21 @@ window.confirmRefill = async function(){
   toast(`✅ เติมสินค้าวันที่ ${thaiDate(dateStr)} สำเร็จ!`);
 };
 
-window.confirmSale = async function(){
-  const dateStr=document.getElementById('sale-date').value;
+window.confirmSale = async function() {
+  const dateStr = document.getElementById('sale-date').value;
   if(!dateStr){toast('⚠️ กรุณาเลือกวันที่ก่อน');return;}
-  const key=dateToKey(dateStr);
-  const ts=new Date(dateStr+'T12:00:00').getTime();
-  const updates={};let any=false;
-  for(const p of products){
-    const q=saleQty[p.id];
-    if(q>0){
-      const cur=stock[p.id]||0;
+  const key = dateToKey(dateStr);
+  const ts = new Date(dateStr+'T12:00:00').getTime();
+  const updates = {}; let any = false;
+  for(const p of products) {
+    const q = saleQty[p.id];
+    if(q>0) {
+      const cur = stock[p.id]||0;
       if(q>cur){toast(`⚠️ ${p.name} ในตู้มีไม่พอ (เหลือ ${cur})`);return;}
-      updates[`stock/${p.id}`]=cur-q;
+      updates[`stock/${p.id}`] = cur-q;
       await push(ref(db,`logs/${key}`),{type:'sale',id:p.id,name:p.name,qty:q,ts,dateStr});
       saleQty[p.id]=0;
-      const el=document.getElementById(`sale-qty-${p.id}`);
+      const el = document.getElementById(`sale-qty-${p.id}`);
       if(el) el.value=0;
       any=true;
     }
@@ -377,55 +505,94 @@ window.confirmSale = async function(){
   toast(`✅ บันทึกยอดขายวันที่ ${thaiDate(dateStr)} สำเร็จ!`);
 };
 
-window.switchTab = function(tab){
-  document.querySelectorAll('.tab').forEach((b,i)=>{
-    b.classList.toggle('active',['refill','sale','stock','summary','export'][i]===tab);
+// ── manage products ──
+window.addProduct = async function() {
+  const name = document.getElementById('new-name').value.trim();
+  const sub  = document.getElementById('new-sub').value.trim();
+  if(!name){toast('⚠️ กรุณาใส่ชื่อสินค้า');return;}
+  const newId = Date.now();
+  const newKey = `p${newId}`;
+  await set(ref(db,`products/${newKey}`), {
+    id: newId, name, sub, order: products.length, active: true
   });
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-sub').value  = '';
+  toast(`✅ เพิ่ม "${name}" สำเร็จ!`);
+};
+
+window.openEdit = function(key, id, name, sub) {
+  document.getElementById('edit-id').value   = key;
+  document.getElementById('edit-name').value = name;
+  document.getElementById('edit-sub').value  = sub;
+  document.getElementById('edit-modal').classList.add('show');
+};
+
+window.closeModal = function() {
+  document.getElementById('edit-modal').classList.remove('show');
+};
+
+window.saveEdit = async function() {
+  const key  = document.getElementById('edit-id').value;
+  const name = document.getElementById('edit-name').value.trim();
+  const sub  = document.getElementById('edit-sub').value.trim();
+  if(!name){toast('⚠️ กรุณาใส่ชื่อสินค้า');return;}
+  await update(ref(db,`products/${key}`), {name, sub});
+  closeModal();
+  toast(`✅ แก้ไข "${name}" สำเร็จ!`);
+};
+
+window.deleteProduct = async function(key, id, name) {
+  if(!confirm(`ลบ "${name}" ออกจากระบบ?\n(ประวัติการขายและเติมยังคงอยู่)`)) return;
+  await update(ref(db,`products/${key}`), {active: false});
+  toast(`🗑️ ลบ "${name}" แล้ว`);
+};
+
+// ── switch tab ──
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('active', ['refill','sale','stock','summary','manage','export'][i]===tab);
+  });
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-'+tab).classList.add('active');
   if(tab==='summary') renderSummary();
 };
 
-window.exportExcel = async function(){
-  const btn=document.getElementById('export-btn');
+// ── export ──
+window.exportExcel = async function() {
+  const btn = document.getElementById('export-btn');
   btn.textContent='⏳ กำลังโหลดข้อมูล...'; btn.disabled=true;
-  try{
-    const snap=await get(ref(db,'logs'));
-    const raw=snap.val()||{};
-    const todayKey=dateToKey(localDateStr());
-    let allR=[],allS=[];
-    for(const [dk,entries] of Object.entries(raw)){
-      Object.values(entries).forEach(l=>{
+  try {
+    const snap = await get(ref(db,'logs'));
+    const raw = snap.val()||{};
+    const todayKey = dateToKey(localDateStr());
+    let allR=[], allS=[];
+    for(const [dk,entries] of Object.entries(raw)) {
+      Object.values(entries).forEach(l => {
         if(l.type==='refill') allR.push({...l,dk});
         else if(l.type==='sale') allS.push({...l,dk});
       });
     }
     allR.sort((a,b)=>a.ts-b.ts); allS.sort((a,b)=>a.ts-b.ts);
+    const wb = XLSX.utils.book_new();
 
-    const wb=XLSX.utils.book_new();
-
-    // ชีท 1 สต็อก
     const s1=[['ลำดับ','สินค้า','รายละเอียด','จำนวนในตู้ (ชิ้น)']];
     products.forEach((p,i)=>s1.push([i+1,p.name,p.sub,stock[p.id]||0]));
     s1.push([],['','','รวมทั้งหมด',products.reduce((s,p)=>s+(stock[p.id]||0),0)]);
     const ws1=XLSX.utils.aoa_to_sheet(s1); ws1['!cols']=[{wch:6},{wch:32},{wch:20},{wch:18}];
     XLSX.utils.book_append_sheet(wb,ws1,'สตอกปจจบน');
 
-    // ชีท 2 ประวัติเติม
     const s2=[['ลำดับ','วันที่เติม','เวลา','สินค้า','จำนวน (ชิ้น)']];
     allR.forEach((l,i)=>s2.push([i+1,fmtDate(l.ts),fmtTime(l.ts),l.name,l.qty]));
     s2.push([],['','','','รวมทั้งหมด',allR.reduce((s,l)=>s+l.qty,0)]);
     const ws2=XLSX.utils.aoa_to_sheet(s2); ws2['!cols']=[{wch:6},{wch:16},{wch:12},{wch:32},{wch:14}];
     XLSX.utils.book_append_sheet(wb,ws2,'ประวตการเตม');
 
-    // ชีท 3 ประวัติขาย
     const s3=[['ลำดับ','วันที่ขาย','เวลา','สินค้า','จำนวน (ชิ้น)']];
     allS.forEach((l,i)=>s3.push([i+1,fmtDate(l.ts),fmtTime(l.ts),l.name,l.qty]));
     s3.push([],['','','','รวมทั้งหมด',allS.reduce((s,l)=>s+l.qty,0)]);
     const ws3=XLSX.utils.aoa_to_sheet(s3); ws3['!cols']=[{wch:6},{wch:16},{wch:12},{wch:32},{wch:14}];
     XLSX.utils.book_append_sheet(wb,ws3,'ประวตการขาย');
 
-    // ชีท 4 สรุปวันนี้
     const tR=allR.filter(l=>l.dk===todayKey), tS=allS.filter(l=>l.dk===todayKey);
     const aggTR={},aggTS={};
     tR.forEach(l=>{aggTR[l.name]=(aggTR[l.name]||0)+l.qty;});
@@ -436,7 +603,6 @@ window.exportExcel = async function(){
     const ws4=XLSX.utils.aoa_to_sheet(s4); ws4['!cols']=[{wch:32},{wch:16},{wch:16},{wch:14}];
     XLSX.utils.book_append_sheet(wb,ws4,'สรปวนน');
 
-    // ชีท 5 สรุปทั้งหมด
     const aggAR={},aggAS={};
     allR.forEach(l=>{aggAR[l.name]=(aggAR[l.name]||0)+l.qty;});
     allS.forEach(l=>{aggAS[l.name]=(aggAS[l.name]||0)+l.qty;});
@@ -448,15 +614,16 @@ window.exportExcel = async function(){
 
     XLSX.writeFile(wb,`vending-report-${localDateStr().replace(/-/g,'')}.xlsx`);
     toast('✅ ดาวน์โหลด Excel สำเร็จ!');
-  }catch(e){ toast('❌ เกิดข้อผิดพลาด: '+e.message); }
+  } catch(e){ toast('❌ เกิดข้อผิดพลาด: '+e.message); }
   btn.textContent='📥 ดาวน์โหลด Excel'; btn.disabled=false;
 };
 
-// Clock
+// clock
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH');},1000);
 document.getElementById('clock').textContent=new Date().toLocaleTimeString('th-TH');
 
-renderRefillList();
+// init
+initProducts();
 </script>
 </body>
 </html>
